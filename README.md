@@ -92,7 +92,7 @@ SmartBi Mate/
 │       ├── common_columns.csv
 │       ├── sql_example.yaml    # Q→SQL 少样本示例
 │       └── table_selection_example.csv
-├── openchatbi/                 # 核心代码
+├── smartbi_mate/                 # 核心代码
 │   ├── agent_graph.py          # 主 Agent 图
 │   ├── config_loader.py        # 配置加载（已改造）
 │   ├── text2sql/               # SQL 子图（抽取/选表/生成/执行/评分）
@@ -166,7 +166,7 @@ $env:PYTHONIOENCODING="utf-8"
 浏览器打开 http://localhost:8501，在输入框用中文提问。
 
 > **为什么要设这两个环境变量？**
-> - `CONFIG_FILE`：程序默认找 `openchatbi/config.yaml`，实际在 `config/config.yaml`，不设会报「配置未加载」。
+> - `CONFIG_FILE`：程序默认找 `smartbi_mate/config.yaml`，实际在 `config/config.yaml`，不设会报「配置未加载」。
 > - `PYTHONIOENCODING`：Windows 终端默认 GBK，中文 + emoji 输出会崩。
 
 ---
