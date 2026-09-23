@@ -198,24 +198,11 @@ $env:PYTHONIOENCODING="utf-8"
 
 唯一未通过的是「环比增长率」——agent 生成了 6/7 月各月销售额，但没算增长率百分比；这是当前能力边界，也是一个清晰的优化方向。
 
----
-
-## 六、踩坑记录（真实踩过，别重蹈覆辙）
-
-| 坑 | 现象 | 解法 |
-|----|------|------|
-| langchain-openai 1.6.x tokenize bug | 百炼 embedding 收到 token ID 而非字符串，报错 | 用 `_DashScopeEmbeddingWrapper` 直接调 openai SDK |
-| embedding 端点间歇性 400 | `text-embedding-v4` ~25% 概率 `InternalError`，曾把进程搞崩 | `column_retrieval` 加重试 + 降级空列表（BM25/编辑距离兜底），wrapper 也加重试 |
-| 模块导入时 config 未加载 | 检索器 mapping 为空 | `schema_retrival.py` 懒加载 `_LazyProxy` |
-| table_info.yaml 格式 | `get_table_information()` 返回空 | 改成 `{db_name: {table: {...}}}` 嵌套 |
-| prompt 文件 GBK 编码 | 含中文的 .md/.yaml 读不了 | 所有 `.open()` 加 `encoding="utf-8"`（含 evals 里的两个）|
-| 相对时间误判 | 系统时钟 2026，但数据只有 2024，「今年」被当 2026 空转多轮 | `bi.yaml` 术语表注入「数据时间范围 2024」 |
-| 结果缺用户名 | 只返回 user_id 没 user_name | 术语表加「涉及用户必 JOIN dim_user」规则 |
-| DASHSCOPE_API_KEY 子进程不可见 | 子进程读不到环境变量 | config_loader 增加注册表 fallback |
+## 
 
 ---
 
-## 七、核心设计决策
+## 六、核心设计决策
 
 1. **Embedding 直接走 SDK**：绕开 langchain-openai 的 tokenize 兼容问题（见踩坑表）。
 2. **Catalog 懒加载**：模块级单例改为首次访问才初始化，避开 import 时序问题。
@@ -223,25 +210,11 @@ $env:PYTHONIOENCODING="utf-8"
 4. **http_client 仅注入 ChatOpenAI**：`trust_env=False` 防止走系统代理超时；embedding 不注入（会触发 tokenize bug）。
 5. **HITL 置信度闸门**：SQL 执行后 LLM 打分，低于阈值弹窗请人工 approve/reject/edit，把「拍板权」留给用户。
 
----
 
-## 八、面试讲法（怎么把项目讲出亮点）
-
-**一句话定位**：用 LangGraph 搭的「中文问数」Agent，把自然语言问题自动转成 SQL、执行、可视化，并带置信度闸门做人在回路。
-
-**三个能展开的技术点：**
-
-1. **LangGraph 图编排**——问题分 5 个子图节点（抽取→选表→生成→执行→评分），每个节点可独立调试、可中断续跑，这是相对「一把梭 LLM」的关键差异。
-
-2. **人在回路（HITL）**——SQL 执行后不是直接相信结果，而是用 LLM 按 6 步 rubric 打分，低于阈值就 `interrupt()` 弹给用户确认。这解决了「LLM 生成 SQL 可能错但用户不知情」的核心痛处。
-
-3. **工程鲁棒性**——真实踩过并解决了：embedding 端点抖动导致进程崩溃、配置加载时序、Windows 编码、相对时间误判等一批「看着小但会致命」的坑，每个都能讲出「现象→根因→解法」。
-
-**一个能体现思考深度的观察**：评测时发现「环比增长率」这类需要**跨行计算**的派生指标是能力边界——agent 能算出各月销售额，但把「算增长率」这步丢了。这指向一个真实的产品问题：Text2SQL 对「SQL 单次查询能表达」的问题很强，对「需要多步推导」的问题需要额外的 planning 层。
 
 ---
 
-## 九、开发历程
+## 七、开发历程
 
 - [x] **阶段1**：项目架构设计 + 核心模块实现
 - [x] **阶段2**：配置系统 + MySQL 数据源对接
