@@ -1,4 +1,4 @@
-"""SmartBI Mate：基于 Streamlit 的流式中文 BI 对话界面（带可折叠思考过程）。"""
+﻿"""SmartBI Mate：基于 Streamlit 的流式中文 BI 对话界面（带可折叠思考过程）。"""
 
 import asyncio
 import atexit
@@ -19,10 +19,10 @@ sys.modules["sqlite3"] = sqlite3
 
 from langgraph.types import Command  # noqa: E402
 
-from openchatbi import config as openchatbi_config  # noqa: E402
-from openchatbi.llm.llm import list_llm_providers  # noqa: E402
-from openchatbi.streaming import AgentStreamProcessor, StreamStep, StreamToken  # noqa: E402
-from openchatbi.utils import log  # noqa: E402
+from smartbi_mate import config as smartbi_mate_config  # noqa: E402
+from smartbi_mate.llm.llm import list_llm_providers  # noqa: E402
+from smartbi_mate.streaming import AgentStreamProcessor, StreamStep, StreamToken  # noqa: E402
+from smartbi_mate.utils import log  # noqa: E402
 from sample_ui.async_graph_manager import AsyncGraphManager  # noqa: E402
 from sample_ui.history_loader import load_session_history  # noqa: E402
 from sample_ui.plotly_utils import visualization_dsl_to_gradio_plot  # noqa: E402
@@ -54,7 +54,7 @@ async def process_user_message_stream(
     message: str, user_id: str, session_id: str, llm_provider: str | None, thinking_container, response_container
 ):
     """
-    Process user message through the OpenChatBI graph with real-time updates
+    Process user message through the smartbi_mate graph with real-time updates
     Updates the thinking_container and response_container as processing happens
     """
     thinking_steps = []
@@ -78,7 +78,7 @@ async def process_user_message_stream(
     else:
         stream_input = {"messages": [{"role": "user", "content": message}]}
 
-    from openchatbi.observability.tracing import build_run_config
+    from smartbi_mate.observability.tracing import build_run_config
 
     config = build_run_config(user_id=user_id, session_id=session_id)
 
@@ -279,7 +279,7 @@ def get_available_reports() -> list[str]:
     """Get list of available report files for download."""
     try:
         # Import config here to avoid circular imports
-        from openchatbi import config
+        from smartbi_mate import config
 
         report_dir = Path(config.get().report_directory)
         if not report_dir.exists():
@@ -305,7 +305,7 @@ def get_report_file_content(filename: str) -> tuple[bytes | None, str | None]:
     """
     try:
         # Import config here to avoid circular imports
-        from openchatbi import config
+        from smartbi_mate import config
 
         report_dir = Path(config.get().report_directory)
         file_path = report_dir / filename
@@ -453,7 +453,7 @@ with st.sidebar:
     provider_options = list_llm_providers()
     if provider_options:
         try:
-            default_provider = getattr(openchatbi_config.get(), "llm_provider", None)
+            default_provider = getattr(smartbi_mate_config.get(), "llm_provider", None)
         except Exception:
             default_provider = None
         default_index = provider_options.index(default_provider) if default_provider in provider_options else 0

@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-"""Headless command-line runner for end-to-end testing of the OpenChatBI agent.
+﻿#!/usr/bin/env python
+"""Headless command-line runner for end-to-end testing of the smartbi_mate agent.
 
 This drives the agent graph **in-process** (no Streamlit / HTTP needed) and
 streams the same intermediate steps the Streamlit UI shows — selected tables,
 generated SQL, SQL execution, visualizations, sub-agent thinking and tool calls
-— by reusing :mod:`openchatbi.streaming`.
+— by reusing :mod:`smartbi_mate.streaming`.
 
 Examples
 --------
@@ -45,7 +45,7 @@ try:
 except ImportError:
     pass
 
-from openchatbi.streaming import (
+from smartbi_mate.streaming import (
     AgentStreamProcessor,
     StreamInterrupt,
     StreamStep,
@@ -62,9 +62,9 @@ def build_sync_graph(provider: str | None):
     """Build the synchronous agent graph with an in-memory checkpointer."""
     from langgraph.checkpoint.memory import MemorySaver
 
-    from openchatbi import config
-    from openchatbi.agent_graph import build_agent_graph_sync
-    from openchatbi.tool.memory import get_sync_memory_store
+    from smartbi_mate import config
+    from smartbi_mate.agent_graph import build_agent_graph_sync
+    from smartbi_mate.tool.memory import get_sync_memory_store
 
     return build_agent_graph_sync(
         config.get().catalog_store,
@@ -78,9 +78,9 @@ async def build_async_graph(provider: str | None):
     """Build the asynchronous agent graph with an in-memory checkpointer."""
     from langgraph.checkpoint.memory import MemorySaver
 
-    from openchatbi import config
-    from openchatbi.agent_graph import build_agent_graph_async
-    from openchatbi.tool.memory import get_async_memory_store
+    from smartbi_mate import config
+    from smartbi_mate.agent_graph import build_agent_graph_async
+    from smartbi_mate.tool.memory import get_async_memory_store
 
     return await build_agent_graph_async(
         config.get().catalog_store,
@@ -283,7 +283,7 @@ def _initial_input(message: str):
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Headless CLI to run the OpenChatBI agent end-to-end (streams intermediate steps)."
+        description="Headless CLI to run the smartbi_mate agent end-to-end (streams intermediate steps)."
     )
     parser.add_argument("question", nargs="?", help="Question to ask. Omit to start an interactive REPL.")
     parser.add_argument("--user-id", default="cli", help="User id (default: cli).")
@@ -300,7 +300,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     renderer = CliRenderer(as_json=args.as_json, color=args.color)
-    from openchatbi.observability.tracing import build_run_config
+    from smartbi_mate.observability.tracing import build_run_config
 
     config = build_run_config(user_id=args.user_id, session_id=args.session_id)
 
@@ -314,7 +314,7 @@ def _iter_questions(first: str | None):
     if first is not None:
         yield first
         return
-    print("OpenChatBI CLI — type a question (Ctrl-D / 'exit' to quit).", file=sys.stderr)
+    print("smartbi_mate CLI — type a question (Ctrl-D / 'exit' to quit).", file=sys.stderr)
     while True:
         try:
             line = input("\n> ").strip()

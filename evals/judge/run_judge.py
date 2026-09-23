@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import glob
@@ -10,8 +10,8 @@ from typing import Any
 
 import yaml
 
-# Load .env before importing openchatbi (the llm_judge import below pulls in
-# openchatbi, which instantiates the configured LLM at import time and needs
+# Load .env before importing smartbi_mate (the llm_judge import below pulls in
+# smartbi_mate, which instantiates the configured LLM at import time and needs
 # ANTHROPIC_API_KEY / OPENAI_API_KEY / CONFIG_FILE in the environment).
 try:
     from dotenv import load_dotenv
@@ -202,11 +202,11 @@ def run(
     generated_path: str | None = None,
     config_path: str | None = None,
 ) -> int:
-    # Point openchatbi at the requested config BEFORE building the judge, so the
+    # Point smartbi_mate at the requested config BEFORE building the judge, so the
     # LLM judge uses the same default_llm as the agent (run_judge has no implicit
     # config beyond $CONFIG_FILE otherwise).
     if config_path:
-        from openchatbi import config as _config
+        from smartbi_mate import config as _config
 
         _config.load(config_path)
 
@@ -319,7 +319,7 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         metavar="PATH",
         help=(
-            "Path to the openchatbi config yaml the LLM judge should use "
+            "Path to the smartbi_mate config yaml the LLM judge should use "
             "(same one passed to collect_generated). When omitted, falls back to "
             "$CONFIG_FILE / the default config."
         ),

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import glob
@@ -75,7 +75,7 @@ def collect(
     return records
 
 
-# Nodes whose stream update carries the committed SQL (see openchatbi.streaming).
+# Nodes whose stream update carries the committed SQL (see smartbi_mate.streaming).
 _SQL_NODE_NAMES = ("generate_sql", "regenerate_sql")
 
 
@@ -87,7 +87,7 @@ def _state_from_graph(graph: Any, case: dict[str, Any]) -> dict[str, Any]:
     ``output_schema=OutputState``, and ``get_state().values["sql"]`` stays
     empty). The SQL is emitted in the streaming ``updates`` for the
     ``generate_sql`` / ``regenerate_sql`` nodes — exactly what ``run_cli`` and
-    ``openchatbi.streaming`` read. We stream with ``subgraphs=True`` and keep the
+    ``smartbi_mate.streaming`` read. We stream with ``subgraphs=True`` and keep the
     last non-empty ``sql`` (so a regenerate-after-retry wins). A pause surfaces
     as an ``__interrupt__`` update, which we forward so
     :func:`extract_sql_from_state` returns ``""``.
@@ -97,8 +97,8 @@ def _state_from_graph(graph: Any, case: dict[str, Any]) -> dict[str, Any]:
     case_id = str(case.get("id", ""))
     prompt = (case.get("input") or {}).get("prompt", "")
     run_id = f"eval-{case_id}" if case_id else "eval-case"
-    from openchatbi.observability.context import current_request_id, current_user_id
-    from openchatbi.observability.tracing import build_run_config
+    from smartbi_mate.observability.context import current_request_id, current_user_id
+    from smartbi_mate.observability.tracing import build_run_config
 
     last_sql = ""
     interrupted = False
@@ -112,7 +112,7 @@ def _state_from_graph(graph: Any, case: dict[str, Any]) -> dict[str, Any]:
             request_id=run_id,
             base={
                 "configurable": {"thread_id": run_id},
-                "run_name": f"openchatbi-eval:{run_id}",
+                "run_name": f"smartbi_mate-eval:{run_id}",
             },
         )
         for _namespace, update in graph.stream(
@@ -149,7 +149,7 @@ def build_agent_runner(config_path: str, provider: str | None = None) -> Callabl
     the pure functions above never touches the network.
     """
     # Load .env first so ANTHROPIC_API_KEY / OPENAI_API_KEY (and CONFIG_FILE)
-    # are available before openchatbi instantiates the LLM at import time.
+    # are available before smartbi_mate instantiates the LLM at import time.
     try:
         from dotenv import load_dotenv
 
@@ -157,16 +157,16 @@ def build_agent_runner(config_path: str, provider: str | None = None) -> Callabl
     except ImportError:
         pass
 
-    # Point config at the requested yaml BEFORE importing openchatbi (which
+    # Point config at the requested yaml BEFORE importing smartbi_mate (which
     # calls config.load() at import time reading $CONFIG_FILE), then re-load
     # defensively.
     os.environ["CONFIG_FILE"] = config_path
 
     from langgraph.checkpoint.memory import MemorySaver
 
-    from openchatbi import config
-    from openchatbi.agent_graph import build_agent_graph_sync
-    from openchatbi.tool.memory import get_sync_memory_store
+    from smartbi_mate import config
+    from smartbi_mate.agent_graph import build_agent_graph_sync
+    from smartbi_mate.tool.memory import get_sync_memory_store
 
     config.load(config_path)
 

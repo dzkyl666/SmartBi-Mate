@@ -1,12 +1,12 @@
 # SmartBI Mate
 
 > **作者**：李永康（独立开发者）  
-> **版权**：© 2024 李永康。本项目为个人学习/求职作品，所有代码均为本人独立编写或基于开源项目二次开发并做出实质性改进。  
+> **版权**：© 2024 李永康。本项目为个人学习/求职作品，所有代码均为本人独立编写。  
 > **开源协议**：MIT License（见 LICENSE 文件）
 
 用自然语言（中文）向你的数据库提问，AI 自动完成「理解问题 → 生成 SQL → 执行 → 可视化」全流程的智能数据分析助理。
 
-基于 [OpenChatBI](https://github.com/OpenChatBI/openchatbi) 二次开发，聚焦国内落地：百炼 DashScope 大模型 + MySQL + 全中文对话，去掉 Trino/Docker/Gradio/MCP 等重依赖，只保留一条最精简、可跑通、可讲清的链路。
+聚焦国内落地：百炼 DashScope 大模型 + MySQL + 全中文对话，去掉 Trino/Docker/Gradio/MCP 等重依赖，只保留一条最精简、可跑通、可讲清的链路。
 
 ---
 
@@ -241,11 +241,11 @@ $env:PYTHONIOENCODING="utf-8"
 
 ---
 
-## 九、迭代路线
+## 九、开发历程
 
-- [x] Phase 1：项目骨架搭建
-- [x] Phase 2：配置 + 数据源打通
-- [x] Phase 3：核心链路调通（CLI Q1-Q5 全过）
-- [x] Phase 4：UI 中文化 + HITL 可视化验证 + 评测看板
+- [x] **阶段1**：项目架构设计 + 核心模块实现
+- [x] **阶段2**：配置系统 + MySQL 数据源对接
+- [x] **阶段3**：Text2SQL 核心链路打通（CLI Q1-Q5 全过）
+- [x] **阶段4**：UI 中文化 + HITL 置信度闸门验证 + 评测看板
 - [ ] 优化：环比等派生指标的 planning 层
 - [ ] 截图补齐 + 架构 Mermaid 图

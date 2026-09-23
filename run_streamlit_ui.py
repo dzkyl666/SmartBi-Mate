@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-Launch script for the Streamlit-based OpenChatBI interface.
+Launch script for the Streamlit-based smartbi_mate interface.
 
 Usage:
     python run_streamlit_ui.py

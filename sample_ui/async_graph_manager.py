@@ -1,13 +1,13 @@
-"""Common AsyncGraphManager for UIs."""
+﻿"""Common AsyncGraphManager for UIs."""
 
 from typing import Any
 
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-from openchatbi import config
-from openchatbi.agent_graph import build_agent_graph_async
-from openchatbi.tool.memory import cleanup_async_memory_store, get_async_memory_store, setup_async_memory_store
-from openchatbi.utils import log
+from smartbi_mate import config
+from smartbi_mate.agent_graph import build_agent_graph_async
+from smartbi_mate.tool.memory import cleanup_async_memory_store, get_async_memory_store, setup_async_memory_store
+from smartbi_mate.utils import log
 
 
 class AsyncGraphManager:

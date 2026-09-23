@@ -1,8 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from openchatbi.text2sql.confidence import SimpleSQLEvaluator
+from smartbi_mate.text2sql.confidence import SimpleSQLEvaluator
 
 
 @dataclass

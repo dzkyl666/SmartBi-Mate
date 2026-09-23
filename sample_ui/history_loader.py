@@ -1,4 +1,4 @@
-"""Restore chat history from the LangGraph checkpointer for sample UIs.
+﻿"""Restore chat history from the LangGraph checkpointer for sample UIs.
 
 The agent persists full conversation state (``messages``) in the SQLite
 checkpointer keyed by ``thread_id = "{user_id}-{session_id}"``. The sample UIs
@@ -18,8 +18,8 @@ from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from openchatbi.observability.tracing import build_run_config
-from openchatbi.utils import log
+from smartbi_mate.observability.tracing import build_run_config
+from smartbi_mate.utils import log
 
 
 def _extract_text(content: Any) -> str:
