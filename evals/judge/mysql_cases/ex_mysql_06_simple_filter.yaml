@@ -1,0 +1,8 @@
+id: ex_mysql_06_simple_filter
+category: 基础筛选
+description: "退款中的订单数量与总金额"
+input:
+  prompt: "退款中的订单有多少笔，总金额多少"
+gold:
+  expected_sql: "SELECT COUNT(*) AS refund_orders, SUM(order_amount) AS total_refund_amount FROM fact_order WHERE order_status = '退款中'"
+  expected_tool_trajectory: ["text2sql"]

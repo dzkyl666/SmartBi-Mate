@@ -1,0 +1,8 @@
+id: ex_mysql_08_monthly_trend
+category: 时间趋势
+description: "2024年各月销售额趋势（按月份聚合）"
+input:
+  prompt: "2024年每月销售额趋势"
+gold:
+  expected_sql: "SELECT DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(pay_amount) AS monthly_sales FROM fact_order WHERE order_status = '已完成' AND YEAR(order_date) = 2024 GROUP BY DATE_FORMAT(order_date, '%Y-%m') ORDER BY month"
+  expected_tool_trajectory: ["text2sql"]

@@ -1,0 +1,63 @@
+# ============================================================
+# SmartBI Mate 中文问答 → SQL 少样本示例
+# 格式必须为: database_name -> table_name -> "Q: ... A: ..." 文本块
+# ============================================================
+
+'':
+  fact_order: |
+    Q: 上个月华东区的销售额是多少
+    A: SELECT SUM(f.pay_amount) AS total_sales FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE r.region_name = '华东' AND f.order_status = '已完成' AND YEAR(f.order_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(f.order_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+
+    Q: 退款中的订单有多少笔，总金额多少
+    A: SELECT COUNT(*) AS refund_orders, SUM(order_amount) AS total_refund_amount FROM fact_order WHERE order_status = '退款中'
+
+    Q: 2024年各月销售额趋势
+    A: SELECT DATE_FORMAT(order_date, '%Y-%m') AS month, SUM(pay_amount) AS monthly_sales FROM fact_order WHERE order_status = '已完成' AND YEAR(order_date) = 2024 GROUP BY DATE_FORMAT(order_date, '%Y-%m') ORDER BY month
+
+  dim_product: |
+    Q: 各品类本月销售额排名
+    A: SELECT p.category, SUM(f.pay_amount) AS total_sales FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = YEAR(CURDATE()) AND MONTH(f.order_date) = MONTH(CURDATE()) GROUP BY p.category ORDER BY total_sales DESC
+
+    Q: 服饰品类各品牌的毛利率分别是多少
+    A: SELECT p.brand, ROUND(AVG((p.unit_price - p.cost_price) / p.unit_price) * 100, 2) AS gross_margin_pct FROM dim_product p WHERE p.category = '服饰' GROUP BY p.brand ORDER BY gross_margin_pct DESC
+
+    Q: 数码品类6月和7月的销售额环比增长率
+    A: SELECT ROUND((SUM(CASE WHEN MONTH(f.order_date)=7 THEN f.pay_amount ELSE 0 END) - SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END)) / NULLIF(SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END), 0) * 100, 2) AS mom_growth_pct FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE p.category = '数码' AND f.order_status = '已完成' AND YEAR(f.order_date) = 2024 AND MONTH(f.order_date) IN (6, 7)
+
+    Q: 2024年各品类的销售额占比
+    A: SELECT p.category, SUM(f.pay_amount) AS sales, ROUND(SUM(f.pay_amount) / SUM(SUM(f.pay_amount)) OVER() * 100, 2) AS pct FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY p.category ORDER BY sales DESC
+
+    Q: 2024年数码品类每月的销售额环比排名
+    A: SELECT month, monthly_sales, ROUND((monthly_sales - LAG(monthly_sales) OVER (ORDER BY month)) / NULLIF(LAG(monthly_sales) OVER (ORDER BY month), 0) * 100, 2) AS mom_pct FROM (SELECT DATE_FORMAT(f.order_date, '%Y-%m') AS month, SUM(f.pay_amount) AS monthly_sales FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE p.category = '数码' AND f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY DATE_FORMAT(f.order_date, '%Y-%m')) t ORDER BY month
+
+    Q: 2024年6月相对5月的销售额环比增长率（环比 = (本月-上月)/上月）
+    A: SELECT ROUND((SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END) - SUM(CASE WHEN MONTH(f.order_date)=5 THEN f.pay_amount ELSE 0 END)) / NULLIF(SUM(CASE WHEN MONTH(f.order_date)=5 THEN f.pay_amount ELSE 0 END), 0) * 100, 2) AS mom_growth_pct, SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END) AS this_month_sales, SUM(CASE WHEN MONTH(f.order_date)=5 THEN f.pay_amount ELSE 0 END) AS last_month_sales FROM fact_order f WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 AND MONTH(f.order_date) IN (5, 6)
+
+    Q: 2024年全年销售额同比去年增长率（同比 = (今年-去年)/去年）
+    A: SELECT ROUND((SUM(CASE WHEN YEAR(f.order_date)=2024 THEN f.pay_amount ELSE 0 END) - SUM(CASE WHEN YEAR(f.order_date)=2023 THEN f.pay_amount ELSE 0 END)) / NULLIF(SUM(CASE WHEN YEAR(f.order_date)=2023 THEN f.pay_amount ELSE 0 END), 0) * 100, 2) AS yoy_growth_pct FROM fact_order f WHERE f.order_status = '已完成' AND YEAR(f.order_date) IN (2023, 2024)
+
+  dim_user: |
+    Q: 今年客单价最高的前5个用户是谁
+    A: SELECT u.user_name, ROUND(SUM(f.pay_amount) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_order f JOIN dim_user u ON f.user_id = u.user_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = YEAR(CURDATE()) GROUP BY u.user_id, u.user_name ORDER BY aov DESC LIMIT 5
+
+    Q: 钻石会员的平均订单金额是多少
+    A: SELECT ROUND(AVG(f.pay_amount), 2) AS avg_order_amount FROM fact_order f JOIN dim_user u ON f.user_id = u.user_id WHERE u.member_level = '钻石' AND f.order_status = '已完成'
+
+    Q: 复购率是多少
+    A: SELECT ROUND(SUM(CASE WHEN order_cnt >= 2 THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS repurchase_rate_pct FROM (SELECT user_id, COUNT(DISTINCT order_id) AS order_cnt FROM fact_order WHERE order_status = '已完成' GROUP BY user_id) t
+
+    Q: 2024年复购用户数（下单≥2次的用户）
+    A: SELECT COUNT(*) AS repurchase_users FROM (SELECT user_id, COUNT(DISTINCT order_id) AS order_cnt FROM fact_order WHERE order_status = '已完成' AND YEAR(order_date) = 2024 GROUP BY user_id HAVING order_cnt >= 2) t
+
+    Q: 各会员等级的客单价与订单数
+    A: SELECT u.member_level, COUNT(DISTINCT f.order_id) AS order_count, ROUND(SUM(f.pay_amount) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_order f JOIN dim_user u ON f.user_id = u.user_id WHERE f.order_status = '已完成' GROUP BY u.member_level ORDER BY aov DESC
+
+  dim_region: |
+    Q: 哪个城市的订单量最多
+    A: SELECT r.city, COUNT(*) AS order_count FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE f.order_status = '已完成' GROUP BY r.city ORDER BY order_count DESC LIMIT 1
+
+    Q: 华南地区美妆品类的件单价是多少
+    A: SELECT ROUND(SUM(f.pay_amount) / SUM(f.quantity), 2) AS price_per_item FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id JOIN dim_product p ON f.product_id = p.product_id WHERE r.region_name = '华南' AND p.category = '美妆' AND f.order_status = '已完成'
+
+    Q: 2024年Q3各地区的销售额占比
+    A: SELECT r.region_name, SUM(f.pay_amount) AS sales, ROUND(SUM(f.pay_amount) / SUM(SUM(f.pay_amount)) OVER() * 100, 2) AS pct FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 AND QUARTER(f.order_date) = 3 GROUP BY r.region_name ORDER BY sales DESC

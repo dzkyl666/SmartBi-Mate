@@ -1,0 +1,9 @@
+id: ex_mysql_03_top5_aov
+category: 多表关联
+description: "客单价最高的前5个用户（派生指标+TopN+关联用户表取用户名）"
+input:
+  prompt: "2024年客单价最高的前5个用户"
+gold:
+  expected_sql: "SELECT u.user_name, ROUND(SUM(f.pay_amount) / COUNT(DISTINCT f.order_id), 2) AS aov FROM fact_order f JOIN dim_user u ON f.user_id = u.user_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY u.user_id, u.user_name ORDER BY aov DESC LIMIT 5"
+  expected_tool_trajectory: ["text2sql"]
+  expected_result_contains: ["张三", "3087.63"]

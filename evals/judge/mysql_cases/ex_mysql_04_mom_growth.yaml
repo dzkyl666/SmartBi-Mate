@@ -1,0 +1,9 @@
+id: ex_mysql_04_mom_growth
+category: 环比计算
+description: "数码品类6月和7月销售额环比增长率（跨月对比）"
+input:
+  prompt: "数码品类2024年6月和7月的销售额环比增长率"
+gold:
+  expected_sql: "SELECT ROUND((SUM(CASE WHEN MONTH(f.order_date)=7 THEN f.pay_amount ELSE 0 END) - SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END)) / NULLIF(SUM(CASE WHEN MONTH(f.order_date)=6 THEN f.pay_amount ELSE 0 END), 0) * 100, 2) AS mom_growth_pct FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE p.category = '数码' AND f.order_status = '已完成' AND YEAR(f.order_date) = 2024 AND MONTH(f.order_date) IN (6, 7)"
+  expected_tool_trajectory: ["text2sql"]
+  expected_result_contains: ["-19.70"]

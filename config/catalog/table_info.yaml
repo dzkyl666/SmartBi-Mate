@@ -1,0 +1,31 @@
+# ============================================================
+# SmartBI Mate 表元数据（中文）
+# 格式必须为: database_name -> table_name -> {description, selection_rule, ...}
+# ============================================================
+
+'':
+  dim_region:
+    description: '地区维度表，存储七大区、省份、城市信息'
+    selection_rule: '当问题涉及地区筛选（华东/华南等）、省份、城市、区域对比时选择此表'
+    sql_rule: 'region_id 是主键。与 fact_order 通过 region_id 关联。region_name 值为：华东/华南/华北/华中/西南/西北/东北'
+    derived_metric: ''
+  dim_product:
+    description: '商品维度表，存储商品名称、品类、品牌、单价、成本价'
+    selection_rule: '当问题涉及品类、品牌、商品价格、毛利率、SKU时选择此表'
+    sql_rule: 'product_id 是主键。与 fact_order 通过 product_id 关联。category 枚举值：服饰/数码/食品/家居/美妆/运动/图书'
+    derived_metric: '毛利率: (unit_price - cost_price) / unit_price'
+  dim_user:
+    description: '用户维度表，存储用户名、性别、年龄、会员等级、注册日期、所在地区'
+    selection_rule: '当问题涉及用户画像、会员等级、年龄分布、性别比例、新老用户时选择此表'
+    sql_rule: 'user_id 是主键。与 fact_order 通过 user_id 关联。member_level 枚举值：普通/银卡/金卡/钻石'
+    derived_metric: '复购率: COUNT(下单>=2次的用户) / COUNT(DISTINCT user_id)'
+  fact_order:
+    description: '订单事实表（核心业务表），记录每笔订单的用户、商品、地区、数量、金额、状态、日期'
+    selection_rule: '几乎所有销售分析问题都需要此表。涉及销售额、订单量、客单价、折扣、时间趋势时必须选'
+    sql_rule: |
+      order_id 是主键。统计销售额时只算 order_status='已完成'。
+      pay_amount = order_amount * (1 - discount)。
+      order_date 和 pay_date 是 DATE 类型，用 YEAR()/MONTH() 提取年月。
+    derived_metric: |
+      客单价(AOV): SUM(pay_amount) / COUNT(DISTINCT order_id) WHERE order_status='已完成'
+      件单价: SUM(pay_amount) / SUM(quantity) WHERE order_status='已完成'

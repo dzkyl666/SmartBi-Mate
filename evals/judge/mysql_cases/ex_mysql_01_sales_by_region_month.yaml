@@ -1,0 +1,9 @@
+id: ex_mysql_01_sales_by_region_month
+category: 聚合查询
+description: "2024年6月华东区销售额（单表聚合+join维度表）"
+input:
+  prompt: "2024年6月华东区销售额是多少"
+gold:
+  expected_sql: "SELECT SUM(f.pay_amount) AS total_sales FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE r.region_name = '华东' AND f.order_status = '已完成' AND YEAR(f.order_date) = 2024 AND MONTH(f.order_date) = 6"
+  expected_tool_trajectory: ["text2sql"]
+  expected_result_contains: ["7719.85"]

@@ -1,0 +1,11 @@
+question,tables,reasoning
+上个月华东区的销售额是多少,"fact_order,dim_region",需要订单金额和地区筛选
+各品类本月销售额排名,"fact_order,dim_product",需要订单金额和品类分组
+今年客单价最高的前5个用户,"fact_order,dim_user",需要订单金额和用户信息计算AOV
+数码品类6月和7月的环比增长率,"fact_order,dim_product",需要按月汇总+品类筛选
+钻石会员的平均订单金额,"fact_order,dim_user",需要订单金额+会员等级筛选
+哪个城市的订单量最多,"fact_order,dim_region",需要订单计数+城市分组
+服饰品类各品牌的毛利率,dim_product,只需要商品表的单价和成本价
+最近3个月每月新增用户数,dim_user,只需要用户表的注册日期
+退款中的订单有多少笔,fact_order,只需要订单表的状态筛选
+华南地区美妆品类的件单价,"fact_order,dim_region,dim_product",三表关联：地区+品类+订单金额

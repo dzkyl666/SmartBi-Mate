@@ -1,0 +1,8 @@
+id: ex_mysql_10_brand_margin
+category: 派生指标
+description: "服饰品类各品牌毛利率（派生指标计算）"
+input:
+  prompt: "服饰品类各品牌的毛利率分别是多少"
+gold:
+  expected_sql: "SELECT p.brand, ROUND(AVG((p.unit_price - p.cost_price) / p.unit_price) * 100, 2) AS gross_margin_pct FROM dim_product p WHERE p.category = '服饰' GROUP BY p.brand ORDER BY gross_margin_pct DESC"
+  expected_tool_trajectory: ["text2sql"]

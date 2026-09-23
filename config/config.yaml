@@ -1,0 +1,95 @@
+# ============================================================
+# SmartBI Mate 主配置文件
+# API Key 通过环境变量 DASHSCOPE_API_KEY 注入，不要在此文件中硬编码
+# ============================================================
+
+organization: SmartBI
+dialect: mysql
+
+# BI 业务知识配置文件路径
+bi_config_file: config/catalog/bi.yaml
+
+# SQL 执行结果限制
+enable_sql_result_limit: true
+sql_result_limit: 10000
+
+# 应用层只读守卫（建议生产环境开启）
+enable_fail_closed_sql_guard: false
+
+# Python 代码执行器（local = 本机执行，禁止 docker）
+python_executor: local
+
+# 可视化模式：llm = LLM 生成图表 DSL
+visualization_mode: llm
+
+# 数据目录存储（file_system = YAML + CSV，便于 git 管理）
+catalog_store:
+  store_type: file_system
+  data_path: ./config/catalog
+
+# 数据仓库连接（本地 MySQL）
+data_warehouse_config:
+  # ⚠️ 请将下面的 root / your_password 替换为你的真实 MySQL 账号密码
+  # 也可以改用环境变量方式：在 Python 启动前 export MYSQL_URI=...
+  uri: "mysql+pymysql://用户名:密码@127.0.0.1:3306/insightbi_demo?charset=utf8mb4"
+  database_name: insightbi_demo
+
+# ---- LLM 配置（百炼 DashScope 兼容端点）----
+default_llm:
+  class: langchain_openai.ChatOpenAI
+  params:
+    model: qwen3.7-flash
+    temperature: 0.01
+    max_tokens: 8192
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    # api_key 从环境变量 DASHSCOPE_API_KEY 读取，不硬编码
+
+embedding_model:
+  class: langchain_openai.OpenAIEmbeddings
+  params:
+    model: text-embedding-v4
+    chunk_size: 100
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    tiktoken_model_name: cl100k_base
+    # api_key 从环境变量 DASHSCOPE_API_KEY 读取，不硬编码
+
+# ---- HITL 置信度闸门 ----
+enable_confidence_gate: true
+sql_confidence_threshold: 0.7
+confidence_gate_mode: post_exec
+confidence_evaluator_mode: simple
+
+# ---- 可观测性（默认关闭，需要时开启）----
+observability:
+  audit:
+    enabled: false
+    sink: log
+    mask_sql_literals: true
+  tracing:
+    enabled: false
+  metrics:
+    enabled: false
+
+# ---- SQL 重试配置 ----
+sql_max_retries: 3
+retry_on_timeout: false
+
+# ---- 长期记忆配置 ----
+memory_config:
+  # 开启 SQL 模式自学习：把成功的高置信 SQL 自动存入向量库，后续相似问题直接复用
+  enable_pattern_memory: true
+  # 开启长期记忆的衰减/重要性重排（langmem 用户记忆）
+  enable_memory_decay_rerank: true
+  # 记忆命名空间作用域：global = 所有用户共享 SQL 模式（不含 PII）
+  pattern_scope: global
+  # 记忆衰减半衰期（天）
+  importance_decay_half_life_days: 30.0
+  # 检索分数下限，低于此分数的不返回
+  min_retrieval_score: 0.2
+  # 每次查询注入的最多样例数
+  max_patterns_per_query: 5
+  # 过期记忆清理间隔（小时）
+  prune_interval_hours: 24
+
+# ---- 报告输出目录 ----
+report_directory: ./data/reports

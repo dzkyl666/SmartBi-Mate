@@ -1,0 +1,8 @@
+id: ex_mysql_07_user_profile
+category: 用户画像
+description: "2024年哪个城市的订单量最多（关联地区维度取城市名）"
+input:
+  prompt: "2024年哪个城市的订单量最多"
+gold:
+  expected_sql: "SELECT r.city, COUNT(*) AS order_count FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY r.city ORDER BY order_count DESC LIMIT 1"
+  expected_tool_trajectory: ["text2sql"]

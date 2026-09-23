@@ -1,0 +1,9 @@
+id: ex_mysql_02_category_rank
+category: 聚合查询
+description: "各品类2024年销售额排名（分组+排序）"
+input:
+  prompt: "各品类2024年的销售额排名"
+gold:
+  expected_sql: "SELECT p.category, SUM(f.pay_amount) AS total_sales FROM fact_order f JOIN dim_product p ON f.product_id = p.product_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY p.category ORDER BY total_sales DESC"
+  expected_tool_trajectory: ["text2sql"]
+  expected_result_contains: ["数码", "82872.65"]

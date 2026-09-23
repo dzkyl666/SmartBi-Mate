@@ -1,0 +1,8 @@
+id: ex_mysql_09_member_level
+category: 用户画像
+description: "钻石会员的平均订单金额（关联用户维度表）"
+input:
+  prompt: "钻石会员的平均订单金额是多少"
+gold:
+  expected_sql: "SELECT ROUND(AVG(f.pay_amount), 2) AS avg_order_amount FROM fact_order f JOIN dim_user u ON f.user_id = u.user_id WHERE u.member_level = '钻石' AND f.order_status = '已完成'"
+  expected_tool_trajectory: ["text2sql"]

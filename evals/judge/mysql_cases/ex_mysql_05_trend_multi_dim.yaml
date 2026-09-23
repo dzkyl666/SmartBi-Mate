@@ -1,0 +1,9 @@
+id: ex_mysql_05_trend_multi_dim
+category: 时间趋势
+description: "2024年各地区每月销售额趋势（时间序列+多维度分组）"
+input:
+  prompt: "2024年各地区每月的销售额趋势"
+gold:
+  expected_sql: "SELECT DATE_FORMAT(f.order_date, '%Y-%m') AS month, r.region_name, SUM(f.pay_amount) AS total_sales FROM fact_order f JOIN dim_region r ON f.region_id = r.region_id WHERE f.order_status = '已完成' AND YEAR(f.order_date) = 2024 GROUP BY DATE_FORMAT(f.order_date, '%Y-%m'), r.region_name ORDER BY month, r.region_name"
+  expected_tool_trajectory: ["text2sql"]
+  expected_result_contains: ["华东", "华北"]

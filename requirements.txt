@@ -1,0 +1,42 @@
+# SmartBI Mate dependencies
+# Install: pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+
+# LangChain / LangGraph core
+langgraph>=1.2.2
+langchain>=1.3.2
+langchain-openai>=1.1.0
+langchain-community>=0.3.27,<1.0.0
+langgraph-checkpoint-sqlite>=2.0.11
+langchain-chroma>=0.2.5
+langmem>=0.0.29
+
+# Database
+sqlalchemy>=2.0.41,<3.0.0
+pymysql>=1.1.0,<2.0.0
+aiosqlite>=0.21.0
+
+# Retrieval / NLP
+rank-bm25>=0.2.2,<1.0.0
+python-levenshtein>=0.27.1
+jieba>=0.42.1
+
+# UI
+streamlit>=1.49.1,<2.0.0
+plotly>=5.17.0,<6.0.0
+
+# Data processing / Visualization
+pandas>=2.2.0,<3.0.0
+numpy>=2.3.0,<3.0.0
+matplotlib>=3.10.6,<4.0.0
+seaborn>=0.13.0,<1.0.0
+
+# Utilities
+requests>=2.31.0,<3.0.0
+pyyaml>=6.0,<7.0
+json5>=0.10.0,<1.0.0
+regex>=2024.0.0
+fastapi>=0.115.0
+httpx>=0.28.0
+
+# Pydantic
+pydantic>=2.0.0,<3.0.0
