@@ -211,14 +211,3 @@ $env:PYTHONIOENCODING="utf-8"
 5. **HITL 置信度闸门**：SQL 执行后 LLM 打分，低于阈值弹窗请人工 approve/reject/edit，把「拍板权」留给用户。
 
 
-
----
-
-## 七、开发历程
-
-- [x] **阶段1**：项目架构设计 + 核心模块实现
-- [x] **阶段2**：配置系统 + MySQL 数据源对接
-- [x] **阶段3**：Text2SQL 核心链路打通（CLI Q1-Q5 全过）
-- [x] **阶段4**：UI 中文化 + HITL 置信度闸门验证 + 评测看板
-- [ ] 优化：环比等派生指标的 planning 层
-- [ ] 截图补齐 + 架构 Mermaid 图
