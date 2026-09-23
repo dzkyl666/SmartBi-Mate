@@ -29,9 +29,9 @@ catalog_store:
 
 # 数据仓库连接（本地 MySQL）
 data_warehouse_config:
-  # ⚠️ 请将下面的 root / your_password 替换为你的真实 MySQL 账号密码
+  # ⚠️ 请将下面的 USER / PASSWORD 替换为你的真实 MySQL 账号密码
   # 也可以改用环境变量方式：在 Python 启动前 export MYSQL_URI=...
-  uri: "mysql+pymysql://用户名:密码@127.0.0.1:3306/insightbi_demo?charset=utf8mb4"
+  uri: "mysql+pymysql://USER:PASSWORD@127.0.0.1:3306/insightbi_demo?charset=utf8mb4"
   database_name: insightbi_demo
 
 # ---- LLM 配置（百炼 DashScope 兼容端点）----

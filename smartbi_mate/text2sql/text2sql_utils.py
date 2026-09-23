@@ -1,4 +1,4 @@
-﻿"""Utility functions for text2sql retrieval systems."""
+"""Utility functions for text2sql retrieval systems."""
 
 from __future__ import annotations
 
@@ -73,8 +73,10 @@ class LearnedSQLStore:
             namespace: Tenant/scope tag; 'global' must hold only schema-level patterns.
         """
         now = datetime.now(UTC).isoformat()
+        # ⚠️ metadata 里不存 SQL：SQL 可能含中文（如 '华东'），Chroma 持久化
+        # metadata 用 latin-1 编码，中文字符会触发 'latin-1' codec 崩溃。
+        # SQL 一律走 example_dict（下方镜像），retrieve 时同源取值。
         metadata = {
-            "sql": sql,
             "tables": tables,
             "source": source,
             "importance": importance,
@@ -135,6 +137,10 @@ class LearnedSQLStore:
         In-place metadata mutation covers SimpleStore (search returns the shared
         Document objects); a Chroma-style ``_collection.update`` persists the bump
         for stores that return copies.
+
+        ⚠️ 回写 Chroma 的 metadata 只带 ASCII 安全的字段（use_count/last_used），
+        绝不把可能的含中文字段（如旧数据的 sql/tables）原样回写 —— 否则 Chroma
+        持久化会用 latin-1 编码 metadata，中文触发 'latin-1' codec 崩溃。
         """
         now = datetime.now(UTC).isoformat()
         with self.lock:
@@ -145,7 +151,11 @@ class LearnedSQLStore:
                     collection = getattr(self.vector_db, "_collection", None)
                     doc_id = getattr(doc, "id", None)
                     if collection is not None and doc_id:
-                        collection.update(ids=[doc_id], metadatas=[doc.metadata])
+                        # 只回写 ASCII 安全字段，避免中文 metadata 触发 latin-1 编码错误
+                        collection.update(
+                            ids=[doc_id],
+                            metadatas=[{"use_count": doc.metadata["use_count"], "last_used": now}],
+                        )
                 except Exception as e:
                     log(f"use_count touch failed (ignored): {e}")
 

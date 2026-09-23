@@ -1,4 +1,4 @@
-﻿import importlib
+import importlib
 import os
 from importlib.util import find_spec
 from typing import Any
@@ -269,6 +269,14 @@ class ConfigLoader:
             log("WARN: Missing LLM config key: embedding_model, will use BM25 based retrival only")
         if "data_warehouse_config" not in config_data:
             raise ValueError("Missing Data Warehouse config key: data_warehouse_config")
+
+        # 用 MYSQL_URI 环境变量覆盖仓库里的脱敏 URI（USER:PASSWORD 占位符）。
+        # 这样 config.yaml 可以安全提交到公开仓库（不含真实密码），
+        # 本机运行时通过环境变量 / .env 注入真实连接串。
+        _env_uri = os.environ.get("MYSQL_URI", "")
+        if _env_uri:
+            config_data["data_warehouse_config"]["uri"] = _env_uri
+            log("Using MYSQL_URI from environment variable for data warehouse connection.")
 
         # Load BI configuration
         if "bi_config_file" in config_data:
